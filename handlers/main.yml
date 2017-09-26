@@ -1,0 +1,7 @@
+---
+
+- name: restart mqtt exporter
+  become: yes
+  service:
+    name: prometheus-mqtt-exporter
+    state: restarted

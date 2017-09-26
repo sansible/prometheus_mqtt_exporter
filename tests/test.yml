@@ -1,0 +1,36 @@
+---
+
+- name: Test Prometheus MQTT Exporter role
+  hosts: all
+
+  pre_tasks:
+    - name: Update apt
+      become: yes
+      apt:
+        cache_valid_time: 1800
+        update_cache: yes
+      tags:
+        - build
+
+  roles:
+    - role: sansible.prometheus_mqtt_exporter
+      prometheus_mqtt_exporter:
+        start_on_boot: yes
+
+  post_tasks:
+    - name: Get Prometheus MQTT Exporter service state
+      become: yes
+      service:
+        name: prometheus-mqtt-exporter
+        state: started
+      register: status
+      tags:
+        - assert
+
+    - name: Assert that Prometheus MQTT Exporter has been running
+      assert:
+        that:
+          - "false == status.changed"
+          - "'started' == status.state"
+      tags:
+        - assert

@@ -1,0 +1,74 @@
+---
+
+- name: Create Prometheus MQTT Exporter directories
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ prometheus_mqtt_exporter.user }}"
+    group: "{{ prometheus_mqtt_exporter.group }}"
+    mode: 0750
+  with_items:
+    - "{{ prometheus_mqtt_exporter.path.install }}"
+    - "{{ prometheus_mqtt_exporter.path.install }}/bin"
+    - "{{ prometheus_mqtt_exporter.path.install }}/prometheus_mqtt_exporter"
+    - "{{ prometheus_mqtt_exporter.path.log }}"
+
+- name: Copy wrapper shell script
+  become: yes
+  copy:
+    dest: "{{ prometheus_mqtt_exporter.path.install }}/bin/prometheus_wrapper"
+    group: "{{ prometheus_mqtt_exporter.group }}"
+    mode: 0755
+    owner: "{{ prometheus_mqtt_exporter.user }}"
+    src: prometheus_wrapper
+
+- name: stat Download File
+  stat:
+    path: "{{ prometheus_mqtt_exporter.download_dest }}"
+  register: exporter_tar
+
+- name: Download Prometheus MQTT Exporter tarball
+  become: yes
+  get_url:
+    url: "{{ prometheus_mqtt_exporter.download_url }}"
+    dest: "{{ prometheus_mqtt_exporter.download_dest }}"
+    checksum: "{{ prometheus_mqtt_exporter.checksum }}"
+  when: exporter_tar.stat.exists == False
+
+- name: Ensure Prometheus MQTT Exporter directory is created
+  become: yes
+  file:
+    path: "{{ prometheus_mqtt_exporter.path.install }}/prometheus_mqtt_exporter"
+    state: directory
+    owner: "{{ prometheus_mqtt_exporter.user }}"
+    group: "{{ prometheus_mqtt_exporter.group }}"
+
+- name: Untar Prometheus MQTT Exporter tarball
+  become: yes
+  unarchive:
+    src: "{{ prometheus_mqtt_exporter.download_dest }}"
+    dest: "{{ prometheus_mqtt_exporter.path.install }}/prometheus_mqtt_exporter"
+    owner: "{{ prometheus_mqtt_exporter.user }}"
+    group: "{{ prometheus_mqtt_exporter.group }}"
+    remote_src: True
+
+- name: Make Prometheus MQTT Exporter a service
+  become: yes
+  template:
+    dest: /etc/init.d/prometheus-mqtt-exporter
+    mode: 0755
+    src: prometheus_mqtt_exporter.sysvinit.j2
+
+- name: Copy Prometheus MQTT Exporter defaults
+  become: yes
+  template:
+    dest: /etc/default/prometheus-mqtt-exporter
+    mode: 0644
+    src: prometheus_mqtt_exporter.default.j2
+
+- name: Enable Prometheus MQTT Exporter service
+  become: yes
+  service:
+    name: prometheus-mqtt-exporter
+    enabled: "{{ prometheus_mqtt_exporter.start_on_boot }}"

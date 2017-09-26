@@ -1,0 +1,19 @@
+---
+
+- name: Deploy config from template
+  become: yes
+  template:
+    dest: "{{ prometheus_mqtt_exporter.path.install }}/prometheus_mqtt_exporter/config.yml"
+    group: "{{ prometheus_mqtt_exporter.group }}"
+    mode: 0644
+    owner: "{{ prometheus_mqtt_exporter.user }}"
+    src: config.yml.j2
+  notify:
+    - restart mqtt exporter
+
+- name: Start Prometheus MQTT Exporter
+  become: yes
+  service:
+    name: prometheus-mqtt-exporter
+    state: started
+  when: prometheus_mqtt_exporter.start_on_boot
