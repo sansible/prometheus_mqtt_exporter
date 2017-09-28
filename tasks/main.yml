@@ -1,0 +1,11 @@
+---
+
+- name: Install Prometheus MQTT Exporter
+  include: build.yml
+  tags:
+    - build
+
+- name: Configure Prometheus MQTT Exporter
+  include: configure.yml
+  tags:
+    - configure

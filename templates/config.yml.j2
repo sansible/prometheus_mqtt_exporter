@@ -1,0 +1,11 @@
+---
+
+probes:
+  {% for item in prometheus_mqtt_exporter.config -%}
+  - name: {{ item.name }} 
+    broker_url: {{ item.broker_url }}
+    topic: {{ item.topic }}
+    client_prefix: {{ item.client_prefix }}
+    messages: {{ item.messages }}
+    interval: {{ item.interval }}
+  {%- endfor %}

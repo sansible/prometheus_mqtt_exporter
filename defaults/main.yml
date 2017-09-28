@@ -1,0 +1,21 @@
+---
+
+prometheus_mqtt_exporter:
+  checksum: sha256:4b0dad5e81ce3f0b12ab9cc309207bd14a793124d376bfbf9cf9963d4a9239ce
+  config:
+    - name: MQTT Broker
+      broker_url: tcp://localhost:1883
+      topic: internal/monitoring/nonssl/exporter
+      client_prefix: internal.monitoring.nonssl.exporter-1
+      messages: 10
+      interval: 30s
+  download_dest: "/tmp/mqtt_blackbox_exporter-v0.2.1.linux-amd64.tar.gz"
+  download_url: https://github.com/inovex/mqtt_blackbox_exporter/releases/download/v0.2.1/mqtt_blackbox_exporter-v0.2.1.linux-amd64.tar.gz
+  group: prometheus
+  opts: -config.file /home/prometheus/prometheus_mqtt_exporter/config.yml
+  path:
+    install: /home/prometheus
+    log: /var/log/prometheus
+    pid: /var/run/prometheus
+  start_on_boot: no
+  user: prometheus
