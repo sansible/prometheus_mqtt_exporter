@@ -3,10 +3,10 @@
 prometheus_mqtt_exporter:
   checksum: sha256:4b0dad5e81ce3f0b12ab9cc309207bd14a793124d376bfbf9cf9963d4a9239ce
   config:
-    - name: MQTT Broker
+    - name: mqtt-broker
       broker_url: tcp://localhost:1883
-      topic: internal/monitoring/nonssl/exporter
-      client_prefix: internal.monitoring.nonssl.exporter-1
+      topic: #
+      client_prefix: internal.monitoring.nonssl.exporter
       messages: 10
       interval: 30s
   download_dest: "/tmp/mqtt_blackbox_exporter-v0.2.1.linux-amd64.tar.gz"
